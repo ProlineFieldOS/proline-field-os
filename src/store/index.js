@@ -124,6 +124,14 @@ export const useStore = create(
       updateCrew: (id, patch) => set((s) => ({ crew: s.crew.map((c) => c.id === id ? { ...c, ...patch } : c) })),
       deleteCrew: (id) => set((s) => ({ crew: s.crew.filter((c) => c.id !== id) })),
 
+      // ── Payroll ───────────────────────────────────────────────────
+      addPayrollRun: (run) => set((s) => ({ payrollRuns: [...s.payrollRuns, { id: uid(), ...run, date: new Date().toISOString() }] })),
+
+      // ── Leads ─────────────────────────────────────────────────────
+      addLead: (lead) => set((s) => ({ leads: [...s.leads, { id: uid(), created: new Date().toISOString(), ...lead }] })),
+      updateLead: (id, patch) => set((s) => ({ leads: s.leads.map((l) => l.id === id ? { ...l, ...patch } : l) })),
+      deleteLead: (id) => set((s) => ({ leads: s.leads.filter((l) => l.id !== id) })),
+
       // ── Settings ──────────────────────────────────────────────────
       updateSettings: (patch) => set((s) => ({ settings: { ...s.settings, ...patch } })),
       updateContractDefaults: (patch) => set((s) => ({
