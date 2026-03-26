@@ -1,0 +1,51 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  * { -webkit-tap-highlight-color: transparent; }
+  body { @apply bg-white text-navy font-sans; overscroll-behavior: none; }
+  input, select, textarea, button { font-family: inherit; }
+}
+
+@layer components {
+  .screen { @apply fixed inset-0 bg-white flex flex-col overflow-hidden; }
+  .page-content { @apply flex-1 overflow-y-auto overscroll-contain; padding-bottom: calc(env(safe-area-inset-bottom) + 80px); }
+  .topnav { @apply flex items-center justify-between px-4 bg-navy text-white; min-height: 58px; padding-top: env(safe-area-inset-top); }
+  .bottomnav { @apply fixed bottom-0 left-0 right-0 bg-white border-t border-gray-100 flex; padding-bottom: env(safe-area-inset-bottom); z-index: 50; }
+  .bottomnav-btn { @apply flex-1 flex flex-col items-center justify-center py-2 gap-0.5 text-xs text-gray-400 transition-colors; }
+  .bottomnav-btn.active { @apply text-brand; }
+  .card { @apply bg-white rounded-xl border border-gray-100 p-4; }
+  .card-sm { @apply bg-white rounded-lg border border-gray-100 p-3; }
+  .form-group { @apply mb-4; }
+  .form-label { @apply block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5; }
+  .form-input { @apply w-full px-3 py-2.5 rounded-lg border border-gray-200 text-sm bg-white text-navy focus:outline-none focus:border-brand focus:ring-1 focus:ring-brand transition-colors; }
+  .form-select { @apply form-input appearance-none; }
+  .form-textarea { @apply form-input resize-y; }
+  .btn { @apply inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg text-sm font-semibold border transition-all active:scale-95; }
+  .btn-primary { @apply btn bg-navy text-white border-navy; }
+  .btn-brand { @apply btn bg-brand text-white border-brand; }
+  .btn-ghost { @apply btn bg-white text-navy border-gray-200 hover:bg-gray-50; }
+  .btn-danger { @apply btn bg-red-50 text-red-600 border-red-200; }
+  .badge { @apply inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold; }
+  .badge-green { @apply badge bg-emerald-50 text-emerald-700; }
+  .badge-blue { @apply badge bg-blue-50 text-blue-700; }
+  .badge-amber { @apply badge bg-amber-50 text-amber-700; }
+  .badge-red { @apply badge bg-red-50 text-red-700; }
+  .badge-gray { @apply badge bg-gray-100 text-gray-600; }
+  .section-title { @apply font-display text-xs font-bold uppercase tracking-widest text-gray-400 mb-2; }
+  .kiosk-tile { @apply flex flex-col items-center justify-center gap-2 bg-white rounded-2xl border border-gray-100 p-4 cursor-pointer active:scale-95 transition-all; }
+  .stat-num { @apply text-2xl font-bold font-display text-navy; }
+  .wizard-radio { @apply flex gap-3 p-4 rounded-xl border-2 cursor-pointer transition-all; }
+  .wizard-radio.selected { @apply border-brand bg-blue-50; }
+  .wizard-radio:not(.selected) { @apply border-gray-200 bg-white; }
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 2px; }
+
+/* Safe area */
+.safe-top { padding-top: env(safe-area-inset-top); }
+.safe-bottom { padding-bottom: env(safe-area-inset-bottom); }
