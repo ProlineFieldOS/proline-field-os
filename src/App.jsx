@@ -20,6 +20,10 @@ import Admin from './pages/Admin'
 import Payroll from './pages/Payroll'
 import Expenses from './pages/Expenses'
 import CustomerPortal from './pages/CustomerPortal'
+import PL from './pages/PL'
+import Schedule from './pages/Schedule'
+import AllContracts from './pages/AllContracts'
+import AllChangeOrders from './pages/AllChangeOrders'
 
 function AuthGuard({ children }) {
   const { user, loading } = useAuth()
@@ -57,6 +61,10 @@ function AppRoutes() {
               <Route path="/admin" element={<Admin />} />
               <Route path="/payroll" element={<Payroll />} />
               <Route path="/expenses" element={<Expenses />} />
+              <Route path="/pl" element={<PL />} />
+              <Route path="/schedule" element={<Schedule />} />
+              <Route path="/contracts" element={<AllContracts />} />
+              <Route path="/change-orders" element={<AllChangeOrders />} />
               <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>
           </AppShell>

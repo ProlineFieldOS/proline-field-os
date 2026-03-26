@@ -6,9 +6,10 @@ import { TopNav } from '../components/layout/AppShell'
 
 const MENU = [
   { section: 'Business', items: [
+    { icon: '📊', label: 'P&L', path: '/pl', desc: 'Income, costs & profitability' },
+    { icon: '🗓', label: 'Schedule', path: '/schedule', desc: 'Calendar & crew assignment' },
     { icon: '🧾', label: 'Expenses', path: '/expenses', desc: 'Log materials, fuel & field costs' },
     { icon: '👷', label: 'Payroll', path: '/payroll', desc: 'Crew pay runs & roster' },
-    { icon: '📊', label: 'P&L', path: '/pl', desc: 'Income vs. expenses' },
   ]},
   { section: 'Documents', items: [
     { icon: '📋', label: 'All contracts', path: '/contracts', desc: 'View all signed contracts' },
