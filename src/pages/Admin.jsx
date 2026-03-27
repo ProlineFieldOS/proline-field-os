@@ -74,6 +74,11 @@ export default function Admin() {
             </div>
             <Button variant="primary" className="w-full mt-2" onClick={saveCompany}>Save company info</Button>
             <div className="border-t border-gray-100 pt-4 mt-4">
+              {user?.email === 'brandyturner815@gmail.com' && (
+                <button onClick={() => navigate('/owner')} className="w-full mb-3 py-2.5 bg-[#050d1f] text-white text-xs font-bold rounded-xl">
+                  🔒 Owner portal
+                </button>
+              )}
               <SectionTitle>Account</SectionTitle>
               {user && <p className="text-xs text-gray-400 mb-3">{user.email}</p>}
               <Button variant="ghost" className="w-full" onClick={() => { signOut(); navigate('/auth') }}>Sign out</Button>

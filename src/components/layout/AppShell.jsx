@@ -1,16 +1,33 @@
+import { useState } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
+import { useAuth } from '../../hooks/useAuth'
+import { useStore } from '../../store'
 import { cn } from '../../lib/utils'
 
-const NAV = [
-  { path: '/', icon: HomeIcon, label: 'Dashboard' },
-  { path: '/jobs', icon: BriefcaseIcon, label: 'Jobs' },
-  { path: '/invoices', icon: DollarIcon, label: 'Invoices' },
-  { path: '/leads', icon: FunnelIcon, label: 'Leads' },
-  { path: '/more', icon: GridIcon, label: 'More' },
+const NAV_ALL = [
+  { path: '/dashboard', icon: HomeIcon, label: 'Dashboard', roles: ['owner','foreman','crew'] },
+  { path: '/jobs', icon: BriefcaseIcon, label: 'Jobs', roles: ['owner','foreman','crew'] },
+  { path: '/invoices', icon: DollarIcon, label: 'Invoices', roles: ['owner','foreman'] },
+  { path: '/leads', icon: FunnelIcon, label: 'Leads', roles: ['owner','foreman'] },
+  { path: '/more', icon: GridIcon, label: 'More', roles: ['owner','foreman','crew'] },
 ]
 
 export function AppShell({ children }) {
   const { pathname } = useLocation()
+
+  const { user } = useAuth()
+  const { settings, viewAsRole, setViewAsRole } = useStore()
+
+  // Trial banner: show days remaining if within 14-day trial
+  const trialBanner = (() => {
+    const createdAt = user?.created_at || user?.user_metadata?.planActivatedAt
+    if (!createdAt) return null
+    const daysSince = Math.floor((Date.now() - new Date(createdAt).getTime()) / 86400000)
+    const daysLeft = 14 - daysSince
+    if (daysLeft <= 0) return { expired: true, daysLeft: 0 }
+    if (daysLeft <= 14) return { expired: false, daysLeft }
+    return null
+  })()
 
   return (
     <div className="screen">
@@ -18,7 +35,7 @@ export function AppShell({ children }) {
         {children}
       </div>
       <nav className="bottomnav">
-        {NAV.map(({ path, icon: Icon, label }) => {
+        {NAV_ALL.filter(n => !n.roles || n.roles.includes(viewAsRole || 'owner')).map(({ path, icon: Icon, label }) => {
           const active = path === '/' ? pathname === '/' : pathname.startsWith(path)
           return (
             <NavButton key={path} path={path} active={active} icon={<Icon active={active} />} label={label} />
@@ -36,6 +53,39 @@ function NavButton({ path, active, icon, label }) {
       {icon}
       <span className="text-[10px] font-medium">{label}</span>
     </button>
+  )
+}
+
+function RoleSwitcherDropdown() {
+  const { viewAsRole, setViewAsRole } = useStore()
+  const [open, setOpen] = useState(false)
+  const ROLES = [
+    { id: 'owner', label: 'Owner', icon: '👑' },
+    { id: 'foreman', label: 'Foreman', icon: '🦺' },
+    { id: 'crew', label: 'Crew', icon: '👷' },
+    { id: 'customer', label: 'Customer', icon: '🏠' },
+  ]
+  const current = ROLES.find(r => r.id === viewAsRole) || ROLES[0]
+  return (
+    <div className="relative">
+      <button onClick={() => setOpen(o => !o)}
+        className={cn('flex items-center gap-1 text-xs font-semibold rounded-lg px-2 py-1 transition-colors', viewAsRole !== 'owner' ? 'bg-purple-500 text-white' : 'bg-white/10 text-white/70 hover:text-white')}>
+        <span>{current.icon}</span>
+        <span className="hidden sm:inline">{current.label}</span>
+        <span className="text-xs opacity-60">▾</span>
+      </button>
+      {open && (
+        <div className="absolute right-0 top-8 bg-white rounded-xl shadow-lg border border-gray-100 overflow-hidden z-50 min-w-[140px]">
+          {ROLES.map(role => (
+            <button key={role.id} onClick={() => { setViewAsRole(role.id); setOpen(false) }}
+              className={cn('w-full text-left px-3 py-2.5 text-xs font-medium flex items-center gap-2 transition-colors hover:bg-gray-50', viewAsRole === role.id ? 'bg-purple-50 text-purple-700' : 'text-gray-700')}>
+              <span>{role.icon}</span>{role.label}
+              {viewAsRole === role.id && <span className="ml-auto text-purple-500">✓</span>}
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
   )
 }
 

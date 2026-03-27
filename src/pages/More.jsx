@@ -1,6 +1,7 @@
 import { useNavigate } from 'react-router-dom'
-import { useStore } from '../store'
+import { usePWAInstall } from '../hooks/usePWAInstall'
 import { useAuth } from '../hooks/useAuth'
+import { useStore } from '../store'
 import { fmtM } from '../lib/utils'
 import { TopNav } from '../components/layout/AppShell'
 
@@ -27,7 +28,9 @@ const MENU = [
 export default function More() {
   const navigate = useNavigate()
   const { jobs, invoices, expenses, crew } = useStore()
+  const { canInstall, isInstalled, install } = usePWAInstall()
   const { user } = useAuth()
+  const isPaidPlan = user?.user_metadata?.plan && user.user_metadata.plan !== 'beta_free' && user.user_metadata.plan !== 'trial'
 
   // Quick P&L numbers
   const revenue = invoices.reduce((s,i) => s+(i.payments||[]).reduce((p,pm)=>p+(pm.amount||0),0), 0)
@@ -76,6 +79,27 @@ export default function More() {
           <div className="bg-gray-50 rounded-xl p-3 text-center"><p className="text-xs text-gray-400 mb-1">Invoices</p><p className="font-display font-bold text-navy">{invoices.length}</p></div>
         </div>
 
+        {/* PWA Install — paid plans only */}
+        {!isInstalled && (
+          <div className={`rounded-2xl border p-4 mb-4 ${canInstall && isPaidPlan ? 'border-brand bg-blue-50' : 'border-gray-100 bg-gray-50'}`}>
+            <div className="flex items-center justify-between gap-3">
+              <div>
+                <p className="font-semibold text-sm text-navy">Add to home screen</p>
+                <p className="text-xs text-gray-400 mt-0.5">Install as an app on your phone for the best experience</p>
+              </div>
+              {canInstall && isPaidPlan ? (
+                <button onClick={install} className="text-xs font-bold text-white bg-brand rounded-lg px-3 py-2 flex-shrink-0 active:scale-95">Install</button>
+              ) : (
+                <span className="text-xs text-gray-400 flex-shrink-0">{isPaidPlan ? 'Use browser menu' : 'Paid plans only'}</span>
+              )}
+            </div>
+          </div>
+        )}
+        {isInstalled && (
+          <div className="bg-emerald-50 border border-emerald-100 rounded-xl p-3 mb-4 text-center">
+            <p className="text-xs font-semibold text-emerald-700">✓ App installed on this device</p>
+          </div>
+        )}
         <p className="text-center text-xs text-gray-300 mb-4">Proline Field OS · {user?.email || 'Demo mode'}</p>
       </div>
     </>

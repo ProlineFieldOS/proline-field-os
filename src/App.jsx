@@ -1,6 +1,7 @@
 import { Routes, Route, Navigate } from 'react-router-dom'
 import { AuthProvider, useAuth } from './hooks/useAuth'
 import Landing from './pages/Landing'
+import OwnerPortal from './pages/OwnerPortal'
 import { useStore } from './store'
 import { ToastProvider } from './components/ui'
 import { AppShell } from './components/layout/AppShell'
@@ -78,8 +79,10 @@ function AuthGuard({ children }) {
 function AppRoutes() {
   return (
     <Routes>
+      <Route path="/" element={<LandingOrApp />} />
       <Route path="/auth" element={<AuthPage />} />
       <Route path="/portal/:token" element={<CustomerPortal />} />
+      <Route path="/owner" element={<OwnerPortal />} />
       <Route path="/*" element={
         <AuthGuard>
           <AppShell>

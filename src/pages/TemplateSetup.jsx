@@ -54,7 +54,7 @@ const TRADE_SERVICES = {
 export default function TemplateSetup() {
   const navigate = useNavigate()
   const { user } = useAuth()
-  const { settings, setContractTemplate } = useStore()
+  const { settings, setContractTemplate, templateGenerationCount } = useStore()
   const [step, setStep] = useState(1)
   const [loading, setLoading] = useState(false)
   const [generated, setGenerated] = useState(null)
@@ -298,7 +298,17 @@ Return ONLY valid JSON, no markdown:
                 <div className="text-5xl mb-4">🤖</div>
                 <p className="font-display font-bold text-navy text-lg">Ready to generate</p>
                 <p className="text-gray-400 text-sm mt-1 mb-6 max-w-xs">AI will write scope templates, warranty conditions, and pre-filled change order language for your specific trade</p>
-                <Button variant="primary" className="w-full max-w-xs" onClick={generate}>Generate my template</Button>
+                {(templateGenerationCount || 0) >= 1 && !user?.user_metadata?.plan ? (
+                  <div className="text-center">
+                    <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 mb-4">
+                      <p className="font-semibold text-amber-800 text-sm mb-1">Trial limit reached</p>
+                      <p className="text-xs text-amber-700">Your free trial includes 1 AI template generation. Upgrade to a paid plan for 3/month.</p>
+                    </div>
+                    <Button variant="ghost" className="w-full max-w-xs" onClick={saveTemplate} disabled={!generated}>Use existing template</Button>
+                  </div>
+                ) : (
+                  <Button variant="primary" className="w-full max-w-xs" onClick={generate}>Generate my template</Button>
+                )}
               </div>
             )}
             {!loading && generated && (

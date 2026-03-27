@@ -17,13 +17,13 @@ const INITIAL_STATE = {
   materials: [],
   audit: [],
   settings: {
-    coName: 'Proline Gutter & Exteriors',
-    coPhone: '(864) 328-5581',
-    coEmail: 'Anarchyrebel4life@gmail.com',
-    coCity: 'Greenville',
+    coName: '',
+    coPhone: '',
+    coEmail: '',
+    coCity: '',
     license: '',
     primaryState: 'SC',
-    tagline: 'Quality work, guaranteed.',
+    tagline: '',
     brandColor: '#0a3ef8',
     contractDefaults: {
       lateFee: 1.5,
@@ -37,32 +37,22 @@ const INITIAL_STATE = {
     },
     paymentConfig: {
       check: { enabled: true, handle: '' },
-      zelle: { enabled: true, handle: '(864) 328-5581' },
+      zelle: { enabled: false, handle: '' },
       ach: { enabled: false, handle: '' },
       venmo: { enabled: false, handle: '' },
       cashapp: { enabled: false, handle: '' },
       paypal: { enabled: false, handle: '' },
     },
-    jobTypes: [
-      { id: 'jt1', name: 'Gutters — Install', warrantyYrs: 5 },
-      { id: 'jt2', name: 'Gutters — Repair', warrantyYrs: 2 },
-      { id: 'jt3', name: 'Gutters — Cleaning', warrantyYrs: 1 },
-      { id: 'jt4', name: 'Gutter Guards', warrantyYrs: 7 },
-      { id: 'jt5', name: 'Fascia & Soffit', warrantyYrs: 5 },
-      { id: 'jt6', name: 'Roofing', warrantyYrs: 5 },
-      { id: 'jt7', name: 'Siding', warrantyYrs: 5 },
-      { id: 'jt8', name: 'Windows & Doors', warrantyYrs: 3 },
-      { id: 'jt9', name: 'Decks', warrantyYrs: 3 },
-      { id: 'jt10', name: 'General Remodel', warrantyYrs: 2 },
-      { id: 'jt11', name: 'Other', warrantyYrs: 1 },
-    ],
-    adminSettings: { ownerName: 'Brandy Turner', ownerPayPct: 60, retainPct: 20 },
+    jobTypes: [],
+    adminSettings: { ownerName: '', ownerPayPct: 60, retainPct: 20 },
     brevo: '',
   },
   isDemoMode: false,
+  viewAsRole: 'owner', // owner | foreman | crew | customer
   _hydrated: true,
   contractTemplate: null,
   contractTemplateMeta: null,
+  templateGenerationCount: 0,
   _nextCon: 1001,
   _nextCO: 1001,
   _nextInv: 1001,
@@ -185,7 +175,7 @@ export const useStore = create(
 
       // ── Contract Template ─────────────────────────────────────────
       setContractTemplate: (tpl, meta) => {
-        set({ contractTemplate: tpl, contractTemplateMeta: meta })
+        set(s => ({ contractTemplate: tpl, contractTemplateMeta: meta, templateGenerationCount: (s.templateGenerationCount || 0) + 1 }))
         // Apply template defaults to settings
         if (tpl?.defaultSettings) {
           const d = tpl.defaultSettings
@@ -282,6 +272,8 @@ export const useStore = create(
         ]
         set(s => ({ ...s, jobs, invoices, _nextCon: 1001, _nextCO: 1001, _nextInv: 1003 }))
       },
+
+      setViewAsRole: (role) => set({ viewAsRole: role }),
 
       reset: () => {
         // Preserve settings, template, and auth state — only wipe operational data
