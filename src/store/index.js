@@ -58,9 +58,6 @@ const INITIAL_STATE = {
   _nextInv: 1001,
   _nextEst: 1001,
   schemaVersion: 2,
-            supportTickets: state.supportTickets,
-            accountTeam: state.accountTeam,
-            subscription: state.subscription,
   supportTickets: [],          // submitted by this account to platform support
   accountTeam: [],             // [{id, name, email, role:'owner'|'office'|'foreman'|'crew', addedAt}]
   subscription: {              // subscription/billing metadata
@@ -246,6 +243,7 @@ export const useStore = create(
             jobs: state.jobs, contracts: state.contracts, changeOrders: state.changeOrders,
             invoices: state.invoices, expenses: state.expenses, crew: state.crew,
             payrollRuns: state.payrollRuns, contacts: state.contacts, leads: state.leads, estimates: state.estimates, schemaVersion: 2,
+            supportTickets: state.supportTickets || [], accountTeam: state.accountTeam || [], subscription: state.subscription || {},
             materials: state.materials, settings: state.settings,
             _nextCon: state._nextCon, _nextCO: state._nextCO, _nextInv: state._nextInv,
           },
