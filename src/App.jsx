@@ -2,6 +2,8 @@ import { Routes, Route, Navigate } from 'react-router-dom'
 import { AuthProvider, useAuth } from './hooks/useAuth'
 import Landing from './pages/Landing'
 import SaasAdmin from './pages/SaasAdmin'
+import Support from './pages/Support'
+import AccountTeam from './pages/AccountTeam'
 import { useStore } from './store'
 import { ToastProvider } from './components/ui'
 import { AppShell } from './components/layout/AppShell'
@@ -108,6 +110,8 @@ function AppRoutes() {
               <Route path="/contracts" element={<AllContracts />} />
               <Route path="/change-orders" element={<AllChangeOrders />} />
               <Route path="/template-setup" element={<TemplateSetup />} />
+              <Route path="/support" element={<Support />} />
+              <Route path="/account-team" element={<AccountTeam />} />
               <Route path="/crew" element={<CrewView />} />
               <Route path="/jobs/:jobId/materials" element={<Materials />} />
               <Route path="/jobs/:jobId/comms" element={<CommLog />} />

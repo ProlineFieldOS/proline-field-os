@@ -5,11 +5,11 @@ import { useStore } from '../../store'
 import { cn } from '../../lib/utils'
 
 const NAV_ALL = [
-  { path: '/dashboard', icon: HomeIcon, label: 'Dashboard', roles: ['owner','foreman','crew'] },
-  { path: '/jobs', icon: BriefcaseIcon, label: 'Jobs', roles: ['owner','foreman','crew'] },
-  { path: '/invoices', icon: DollarIcon, label: 'Invoices', roles: ['owner','foreman'] },
-  { path: '/leads', icon: FunnelIcon, label: 'Leads', roles: ['owner','foreman'] },
-  { path: '/more', icon: GridIcon, label: 'More', roles: ['owner','foreman','crew'] },
+  { path: '/dashboard', icon: HomeIcon, label: 'Dashboard', roles: ['owner','office','foreman','crew'] },
+  { path: '/jobs', icon: BriefcaseIcon, label: 'Jobs', roles: ['owner','office','foreman','crew'] },
+  { path: '/invoices', icon: DollarIcon, label: 'Invoices', roles: ['owner','office','foreman'] },
+  { path: '/leads', icon: FunnelIcon, label: 'Leads', roles: ['owner','office','foreman'] },
+  { path: '/more', icon: GridIcon, label: 'More', roles: ['owner','office','foreman','crew'] },
 ]
 
 export function AppShell({ children }) {
@@ -60,10 +60,11 @@ function RoleSwitcherDropdown() {
   const { viewAsRole, setViewAsRole } = useStore()
   const [open, setOpen] = useState(false)
   const ROLES = [
-    { id: 'owner', label: 'Owner', icon: '👑' },
+    { id: 'owner',   label: 'Owner',   icon: '👑' },
+    { id: 'office',  label: 'Office',  icon: '💼' },
     { id: 'foreman', label: 'Foreman', icon: '🦺' },
-    { id: 'crew', label: 'Crew', icon: '👷' },
-    { id: 'customer', label: 'Customer', icon: '🏠' },
+    { id: 'crew',    label: 'Crew',    icon: '👷' },
+    { id: 'customer',label: 'Customer',icon: '🏠' },
   ]
   const current = ROLES.find(r => r.id === viewAsRole) || ROLES[0]
   return (

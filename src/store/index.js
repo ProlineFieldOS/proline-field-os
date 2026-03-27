@@ -48,7 +48,7 @@ const INITIAL_STATE = {
     brevo: '',
   },
   isDemoMode: false,
-  viewAsRole: 'owner', // owner | foreman | crew | customer
+  viewAsRole: 'owner', // owner | office | foreman | crew | customer
   _hydrated: true,
   contractTemplate: null,
   contractTemplateMeta: null,
@@ -58,6 +58,18 @@ const INITIAL_STATE = {
   _nextInv: 1001,
   _nextEst: 1001,
   schemaVersion: 2,
+            supportTickets: state.supportTickets,
+            accountTeam: state.accountTeam,
+            subscription: state.subscription,
+  supportTickets: [],          // submitted by this account to platform support
+  accountTeam: [],             // [{id, name, email, role:'owner'|'office'|'foreman'|'crew', addedAt}]
+  subscription: {              // subscription/billing metadata
+    plan: 'trial',             // trial | solo | crew | company
+    trialStartDate: null,      // ISO date — set at signup
+    billingCycleStart: null,   // ISO date — when paid subscription started
+    renewalDate: null,         // ISO date — next renewal
+    canceledAt: null,          // ISO date — if canceled
+  },
   _nextEst: 1001,
 }
 
@@ -286,6 +298,25 @@ export const useStore = create(
       },
 
       setViewAsRole: (role) => set({ viewAsRole: role }),
+
+      // Support tickets
+      addSupportTicket: (ticket) => set((s) => ({
+        supportTickets: [{ id: uid(), createdAt: new Date().toISOString(), status: 'open', ...ticket }, ...s.supportTickets]
+      })),
+      updateSupportTicket: (id, patch) => set((s) => ({
+        supportTickets: s.supportTickets.map(t => t.id === id ? { ...t, ...patch } : t)
+      })),
+
+      // Account team / ownership
+      addTeamMember: (member) => set((s) => ({
+        accountTeam: [...s.accountTeam, { id: uid(), addedAt: new Date().toISOString(), ...member }]
+      })),
+      removeTeamMember: (id) => set((s) => ({
+        accountTeam: s.accountTeam.filter(m => m.id !== id)
+      })),
+      updateSubscription: (patch) => set((s) => ({
+        subscription: { ...s.subscription, ...patch }
+      })),
 
       reset: () => {
         // Preserve settings, template, and auth state — only wipe operational data

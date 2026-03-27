@@ -26,9 +26,17 @@ export function AuthProvider({ children }) {
       if (session?.user) {
         loadFromSupabase(session.user.id)
         loadTemplateFromSupabase(session.user.id)
-        // On signup, initialize user data row in Supabase immediately
+        // On signup, set trial start date then sync to Supabase
         if (event === 'SIGNED_UP') {
-          syncToSupabase(session.user.id)
+          const { updateSubscription } = useStore.getState ? useStore.getState() : {}
+          if (updateSubscription) {
+            updateSubscription({
+              plan: 'trial',
+              trialStartDate: new Date().toISOString(),
+              renewalDate: new Date(Date.now() + 14 * 86400000).toISOString(),
+            })
+          }
+          setTimeout(() => syncToSupabase(session.user.id), 500)
         }
       }
     })
