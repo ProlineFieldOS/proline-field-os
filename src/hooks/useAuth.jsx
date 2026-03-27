@@ -12,6 +12,7 @@ export function AuthProvider({ children }) {
   useEffect(() => {
     if (!supabase) { setLoading(false); return }
 
+    // Initial session check — load from Supabase once on mount
     supabase.auth.getSession().then(({ data: { session } }) => {
       setUser(session?.user ?? null)
       if (session?.user) {
@@ -23,21 +24,26 @@ export function AuthProvider({ children }) {
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       setUser(session?.user ?? null)
-      if (session?.user) {
+
+      // TOKEN_REFRESHED fires every ~hour and must NOT reload from Supabase
+      // — it would overwrite any unsaved local changes
+      // Only load on actual sign-in events
+      if (event === 'SIGNED_IN' && session?.user) {
         loadFromSupabase(session.user.id)
         loadTemplateFromSupabase(session.user.id)
-        // On signup, set trial start date then sync to Supabase
-        if (event === 'SIGNED_UP') {
-          const { updateSubscription } = useStore.getState ? useStore.getState() : {}
-          if (updateSubscription) {
-            updateSubscription({
-              plan: 'trial',
-              trialStartDate: new Date().toISOString(),
-              renewalDate: new Date(Date.now() + 14 * 86400000).toISOString(),
-            })
-          }
-          setTimeout(() => syncToSupabase(session.user.id), 500)
+      }
+
+      if (event === 'SIGNED_UP' && session?.user) {
+        // New account — set trial dates then sync
+        const store = useStore.getState?.()
+        if (store?.updateSubscription) {
+          store.updateSubscription({
+            plan: 'trial',
+            trialStartDate: new Date().toISOString(),
+            renewalDate: new Date(Date.now() + 14 * 86400000).toISOString(),
+          })
         }
+        setTimeout(() => syncToSupabase(session.user.id), 800)
       }
     })
 
@@ -50,8 +56,10 @@ export function AuthProvider({ children }) {
   }
 
   const signUp = async (email, password, name) => {
-    // Beta: open signup — no invite code required
-    const { data, error } = await supabase.auth.signUp({ email, password, options: { data: { full_name: name, plan: 'beta_free', planActivatedAt: new Date().toISOString() } } })
+    const { data, error } = await supabase.auth.signUp({
+      email, password,
+      options: { data: { full_name: name, plan: 'beta_free', planActivatedAt: new Date().toISOString() } }
+    })
     return { error }
   }
 
@@ -68,7 +76,7 @@ export function AuthProvider({ children }) {
     return { error }
   }
 
-  // Auto-sync to Supabase every 2 minutes if signed in
+  // Auto-sync to Supabase every 2 minutes — push local → remote, never pull
   useEffect(() => {
     if (!user) return
     const interval = setInterval(() => syncToSupabase(user.id), 2 * 60 * 1000)

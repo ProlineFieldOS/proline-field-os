@@ -214,8 +214,7 @@ export default function AccountTeam() {
       </div>
 
       {/* ── Add member modal ── */}
-      {showAdd && (
-        <Modal title="Add team member" onClose={() => setShowAdd(false)}>
+      <Modal open={showAdd} title="Add team member" onClose={() => setShowAdd(false)}>
           <div className="space-y-3 p-4">
             <FormGroup label="Name">
               <Input value={form.name} onChange={set('name')} placeholder="Full name" />
@@ -246,12 +245,10 @@ export default function AccountTeam() {
               Add {ROLE_META[form.role]?.label}
             </Button>
           </div>
-        </Modal>
-      )}
+      </Modal>
 
       {/* ── Change primary owner modal ── */}
-      {showTransfer && (
-        <Modal title="Change primary owner" onClose={() => setShowTransfer(false)}>
+      <Modal open={showTransfer} title="Change primary owner" onClose={() => setShowTransfer(false)}>
           <div className="space-y-3 p-4">
             <div className="bg-amber-50 border border-amber-200 rounded-xl p-3">
               <p className="text-xs font-semibold text-amber-800 mb-1">⚠ Billing seat change</p>
@@ -282,8 +279,7 @@ export default function AccountTeam() {
               Update primary owner
             </Button>
           </div>
-        </Modal>
-      )}
+      </Modal>
     </div>
   )
 }
