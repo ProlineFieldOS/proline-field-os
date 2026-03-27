@@ -19,7 +19,7 @@ export default function Admin() {
   const [acceptedDisclaimer, setAcceptedDisclaimer] = useState(false)
   const [tab, setTab] = useState(params.get('tab') || 'Company')
   const { settings, updateSettings, updateContractDefaults, reset, syncToSupabase } = useStore()
-  const { signOut } = useAuth()
+  const { signOut, user } = useAuth()
 
   const co = settings || {}
   const doSync = () => { if (user?.id && syncToSupabase) syncToSupabase(user.id) }
