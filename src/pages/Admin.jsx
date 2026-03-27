@@ -18,12 +18,11 @@ export default function Admin() {
   const [reviewDate, setReviewDate] = useState(new Date().toISOString().split('T')[0])
   const [acceptedDisclaimer, setAcceptedDisclaimer] = useState(false)
   const [tab, setTab] = useState(params.get('tab') || 'Company')
-  const { settings, updateSettings, updateContractDefaults, reset, syncToSupabase } = useStore()
+  const { settings, updateSettings, updateContractDefaults, reset, syncToSupabase, contractTemplate, contractTemplateMeta, rolePermissions, unlockTemplate } = useStore()
   const { signOut, user } = useAuth()
 
   const co = settings || {}
   const doSync = () => { if (user?.id && syncToSupabase) syncToSupabase(user.id) }
-  const { contractTemplate, contractTemplateMeta } = useStore(s => ({ contractTemplate: s.contractTemplate, contractTemplateMeta: s.contractTemplateMeta }))
   const cd = co.contractDefaults || {}
 
   const [company, setCompany] = useState({ coName: co.coName||'', coPhone: co.coPhone||'', coEmail: co.coEmail||'', license: co.license||'', primaryState: co.primaryState||'SC', tagline: co.tagline||'' })
