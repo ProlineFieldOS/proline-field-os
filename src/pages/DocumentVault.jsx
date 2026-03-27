@@ -93,7 +93,7 @@ export default function DocumentVault() {
   const jobName = (jobId) => jobs.find(j => j.id === jobId)?.client || ''
 
   return (
-    <div className="page">
+    <div className="flex flex-col h-full min-h-0">
       <TopNav title="Document Vault" onBack={() => navigate(-1)}
         actions={
           <button onClick={() => setView(v => v === 'list' ? 'upload' : 'list')}
@@ -103,7 +103,7 @@ export default function DocumentVault() {
         }
       />
 
-      <div className="page-content px-4 pt-4 pb-8">
+      <div className="flex-1 overflow-y-auto px-4 pt-4 pb-24">
 
         {view === 'upload' ? (
           <div className="space-y-4">

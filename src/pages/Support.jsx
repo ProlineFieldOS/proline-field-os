@@ -42,7 +42,7 @@ export default function Support() {
   const priorityColor = p => p === 'Urgent' ? 'red' : p === 'High' ? 'amber' : 'gray'
 
   return (
-    <div className="page">
+    <div className="flex flex-col h-full min-h-0">
       <TopNav title="Support" onBack={() => navigate('/more')}
         actions={
           <button onClick={() => setView(v => v === 'list' ? 'new' : 'list')}
@@ -52,7 +52,7 @@ export default function Support() {
         }
       />
 
-      <div className="page-content px-4 pt-4 pb-8">
+      <div className="flex-1 overflow-y-auto px-4 pt-4 pb-24">
 
         {view === 'new' ? (
           <div className="space-y-4">

@@ -81,27 +81,31 @@ export default function AccountTeam() {
   }
 
   return (
-    <div className="page">
+    <div className="flex flex-col h-full min-h-0">
       <TopNav title="Account & Team" onBack={() => navigate('/admin')}
         actions={
           <button onClick={() => setShowAdd(true)}
-            className="text-white/80 text-xs font-semibold">
+            className="text-xs font-bold text-white bg-brand rounded-lg px-3 py-1.5">
             + Add
           </button>
         }
       />
 
-      <div className="page-content px-4 pt-4 pb-8">
+      <div className="flex-1 overflow-y-auto px-4 pt-4 pb-24">
 
         {/* ── Owners section ── */}
         <div className="flex items-center justify-between mb-3">
           <SectionTitle>Owners ({1 + coOwners.length})</SectionTitle>
-          {coOwners.length > 0 && (
-            <button onClick={() => setShowTransfer(true)}
-              className="text-xs text-gray-400 hover:text-gray-600">
-              Change primary →
-            </button>
-          )}
+          <div className="flex items-center gap-2">
+            <button onClick={() => { setForm(f => ({...f, role: 'owner'})); setShowAdd(true) }}
+              className="text-xs font-semibold text-brand">+ Add co-owner</button>
+            {coOwners.length > 0 && (
+              <button onClick={() => setShowTransfer(true)}
+                className="text-xs text-gray-400 hover:text-gray-600 ml-1">
+                Change primary →
+              </button>
+            )}
+          </div>
         </div>
 
         <div className="space-y-2.5 mb-5">
@@ -144,11 +148,13 @@ export default function AccountTeam() {
         {/* ── Other team members ── */}
         <div className="flex items-center justify-between mb-3">
           <SectionTitle>Team members ({otherMembers.length})</SectionTitle>
+          <button onClick={() => { setForm(f => ({...f, role: 'foreman'})); setShowAdd(true) }}
+            className="text-xs font-semibold text-brand">+ Add member</button>
         </div>
 
         {otherMembers.length === 0 ? (
           <Empty icon="👥" title="No team members yet"
-            description="Add foremen, crew, or office staff. Owners can be added above." />
+            description="Use the Add member button above to add a foreman, crew member, or office staff." />
         ) : (
           <div className="space-y-2.5 mb-6">
             {otherMembers.map(m => {

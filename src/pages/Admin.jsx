@@ -18,7 +18,7 @@ export default function Admin() {
   const [reviewDate, setReviewDate] = useState(new Date().toISOString().split('T')[0])
   const [acceptedDisclaimer, setAcceptedDisclaimer] = useState(false)
   const [tab, setTab] = useState(params.get('tab') || 'Company')
-  const { settings, updateSettings, updateContractDefaults, reset, syncToSupabase, contractTemplate, contractTemplateMeta, rolePermissions, unlockTemplate } = useStore()
+  const { settings, updateSettings, updateContractDefaults, reset, syncToSupabase, contractTemplate, contractTemplateMeta, rolePermissions, unlockTemplate, accountTeam } = useStore()
   const { signOut, user } = useAuth()
 
   const co = settings || {}
@@ -284,15 +284,62 @@ export default function Admin() {
 
         {tab === 'Payroll' && (
           <div className="space-y-3">
+            {/* Owner payroll — one row per owner (primary + co-owners) */}
             <SectionTitle>Owner payroll</SectionTitle>
-            <FormGroup label="Owner name"><Input value={paySettings.ownerName} onChange={e=>setPaySettings(p=>({...p,ownerName:e.target.value}))} placeholder="Brandy Turner" /></FormGroup>
-            <div className="grid grid-cols-2 gap-3">
-              <FormGroup label="Owner draw % of net" hint="% taken as owner pay each run"><Input type="number" min="0" max="100" value={paySettings.ownerPayPct} onChange={e=>setPaySettings(p=>({...p,ownerPayPct:parseInt(e.target.value)||0}))} /></FormGroup>
-              <FormGroup label="Retain in business %" hint="% kept in business account"><Input type="number" min="0" max="100" value={paySettings.retainPct} onChange={e=>setPaySettings(p=>({...p,retainPct:parseInt(e.target.value)||0}))} /></FormGroup>
+            <p className="text-xs text-gray-400 -mt-1 mb-3 leading-relaxed">
+              Set a draw percentage for each owner. All owner draws are taken from net profit before crew payroll.
+              Add additional owners via <button onClick={() => navigate('/account-team')} className="text-brand underline">Account & Team</button>.
+            </p>
+
+            {/* Primary owner row */}
+            <div className="bg-white border border-gray-100 rounded-xl p-3 space-y-2.5 mb-2">
+              <div className="flex items-center gap-2">
+                <span className="text-sm">👑</span>
+                <p className="font-semibold text-sm text-navy">{settings.adminSettings?.ownerName || user?.email || 'Primary owner'}</p>
+                <span className="text-[10px] bg-blue-100 text-blue-700 font-bold px-1.5 py-0.5 rounded">Primary</span>
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <FormGroup label="Draw % of net">
+                  <Input type="number" min="0" max="100" value={paySettings.ownerPayPct}
+                    onChange={e=>setPaySettings(p=>({...p,ownerPayPct:parseInt(e.target.value)||0}))} />
+                </FormGroup>
+                <FormGroup label="Retain in business %">
+                  <Input type="number" min="0" max="100" value={paySettings.retainPct}
+                    onChange={e=>setPaySettings(p=>({...p,retainPct:parseInt(e.target.value)||0}))} />
+                </FormGroup>
+              </div>
             </div>
-            {(paySettings.ownerPayPct + paySettings.retainPct) > 100 && (
-              <p className="text-xs text-red-500">Warning: percentages exceed 100%</p>
-            )}
+
+            {/* Co-owner rows — dynamically from accountTeam */}
+            {(accountTeam || []).filter(m => m.role === 'owner').map(coOwner => {
+              const pctKey = `ownerPct_${coOwner.id}`
+              const pct = paySettings[pctKey] ?? 0
+              return (
+                <div key={coOwner.id} className="bg-white border border-gray-100 rounded-xl p-3 space-y-2.5 mb-2">
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm">👑</span>
+                    <p className="font-semibold text-sm text-navy">{coOwner.name}</p>
+                    <span className="text-[10px] bg-gray-100 text-gray-600 font-bold px-1.5 py-0.5 rounded">Co-owner</span>
+                  </div>
+                  <FormGroup label="Draw % of net">
+                    <Input type="number" min="0" max="100" value={pct}
+                      onChange={e=>setPaySettings(p=>({...p, [pctKey]: parseInt(e.target.value)||0}))} />
+                  </FormGroup>
+                </div>
+              )
+            })}
+
+            {/* Total check */}
+            {(() => {
+              const coOwnerTotal = (accountTeam || []).filter(m => m.role === 'owner')
+                .reduce((sum, m) => sum + (paySettings[`ownerPct_${m.id}`] || 0), 0)
+              const total = paySettings.ownerPayPct + paySettings.retainPct + coOwnerTotal
+              return total > 100 ? (
+                <p className="text-xs text-red-500">⚠ Total owner draws + retain ({total}%) exceed 100%</p>
+              ) : total > 0 ? (
+                <p className="text-xs text-gray-400">Total allocated: {total}% of net profit</p>
+              ) : null
+            })()}
             <Button variant="primary" className="w-full mt-2" onClick={savePayroll}>Save payroll settings</Button>
           </div>
         )}

@@ -33,7 +33,7 @@ export default function RolePermissions() {
   }
 
   return (
-    <div className="page">
+    <div className="flex flex-col h-full min-h-0">
       <TopNav title="Role Permissions" onBack={() => navigate('/admin')}
         actions={
           <button onClick={save} className="text-xs font-bold text-white bg-brand rounded-lg px-3 py-1.5">
@@ -42,7 +42,7 @@ export default function RolePermissions() {
         }
       />
 
-      <div className="page-content px-4 pt-4 pb-8">
+      <div className="flex-1 overflow-y-auto px-4 pt-4 pb-24">
         <p className="text-xs text-gray-500 mb-5 leading-relaxed">
           Control exactly what each role can see and do in your account.
           Owner always has full access and cannot be restricted.
