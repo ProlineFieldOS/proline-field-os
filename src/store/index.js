@@ -57,6 +57,7 @@ const INITIAL_STATE = {
   _nextCO: 1001,
   _nextInv: 1001,
   _nextEst: 1001,
+  schemaVersion: 2,
   _nextEst: 1001,
 }
 
@@ -232,7 +233,7 @@ export const useStore = create(
           db: {
             jobs: state.jobs, contracts: state.contracts, changeOrders: state.changeOrders,
             invoices: state.invoices, expenses: state.expenses, crew: state.crew,
-            payrollRuns: state.payrollRuns, contacts: state.contacts, leads: state.leads, estimates: state.estimates,
+            payrollRuns: state.payrollRuns, contacts: state.contacts, leads: state.leads, estimates: state.estimates, schemaVersion: 2,
             materials: state.materials, settings: state.settings,
             _nextCon: state._nextCon, _nextCO: state._nextCO, _nextInv: state._nextInv,
           },
@@ -247,7 +248,18 @@ export const useStore = create(
         try {
           const { data } = await supabase.from('user_data').select('db').eq('user_id', userId).single()
           if (data?.db) {
-            set((s) => ({ ...s, ...data.db }))
+            const db = data.db
+            // Schema version check: reject old prototype data (pre-v2)
+            // Old data signatures: job ids like 'job_demo1', old settings keys like 'stripeKey'
+            const hasOldJobs = (db.jobs||[]).some(j => j.id?.startsWith('job_demo'))
+            const hasOldSettings = db.settings?.stripeKey !== undefined
+            const isOldSchema = hasOldJobs || hasOldSettings || !db.schemaVersion
+            if (isOldSchema) {
+              console.warn('Supabase has stale prototype data — skipping load, will overwrite on next sync')
+              return false
+            }
+            // Valid schema — load it
+            set((s) => ({ ...s, ...db }))
             return true
           }
         } catch (e) {

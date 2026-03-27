@@ -76,7 +76,7 @@ export default function Admin() {
             <div className="border-t border-gray-100 pt-4 mt-4">
               {user?.email === 'brandyturner815@gmail.com' && (
                 <button onClick={() => navigate('/owner')} className="w-full mb-3 py-2.5 bg-[#050d1f] text-white text-xs font-bold rounded-xl">
-                  🔒 Owner portal
+                  🔒 Platform admin
                 </button>
               )}
               <SectionTitle>Account</SectionTitle>

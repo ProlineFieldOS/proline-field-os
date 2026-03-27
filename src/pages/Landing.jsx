@@ -77,15 +77,26 @@ export default function Landing() {
       <section className="py-8 border-y border-gray-100 overflow-hidden">
         <div className="max-w-5xl mx-auto px-4">
           <p className="text-xs font-semibold text-gray-400 uppercase tracking-widest text-center mb-4">Full job lifecycle — tracked automatically</p>
-          <div className="flex items-center gap-0 overflow-x-auto pb-2 justify-start sm:justify-center">
+              {/* Mobile: 2-column pill grid */}
+          <div className="grid grid-cols-2 sm:hidden gap-2">
+            {LIFECYCLE.map((stage, i) => (
+              <div key={stage} className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-gray-50 border border-gray-100">
+                <div className="w-2 h-2 rounded-full flex-shrink-0"
+                  style={{background: i < 4 ? '#0A3EF8' : i < 8 ? '#854F0B' : '#27500A'}} />
+                <span className="text-[11px] text-gray-600 font-medium truncate">{stage}</span>
+              </div>
+            ))}
+          </div>
+          {/* Desktop: horizontal flow */}
+          <div className="hidden sm:flex items-center flex-wrap gap-x-0 gap-y-3 justify-center">
             {LIFECYCLE.map((stage, i) => (
               <div key={stage} className="flex items-center flex-shrink-0">
                 <div className="flex flex-col items-center">
-                  <div className="w-2.5 h-2.5 rounded-full border-2 flex-shrink-0"
-                    style={{background: i < 4 ? '#0A3EF8' : i < 8 ? '#854F0B' : '#27500A', borderColor: i < 4 ? '#0A3EF8' : i < 8 ? '#854F0B' : '#27500A'}} />
-                  <span className="text-[9px] text-gray-500 mt-1 whitespace-nowrap font-medium">{stage}</span>
+                  <div className="w-2.5 h-2.5 rounded-full"
+                    style={{background: i < 4 ? '#0A3EF8' : i < 8 ? '#854F0B' : '#27500A'}} />
+                  <span className="text-[10px] text-gray-500 mt-1 whitespace-nowrap font-medium">{stage}</span>
                 </div>
-                {i < LIFECYCLE.length - 1 && <div className="w-6 h-px bg-gray-200 flex-shrink-0 mb-3" />}
+                {i < LIFECYCLE.length - 1 && <div className="w-5 h-px bg-gray-200 flex-shrink-0 mb-3" />}
               </div>
             ))}
           </div>
