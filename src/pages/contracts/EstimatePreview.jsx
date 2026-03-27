@@ -13,7 +13,16 @@ export default function EstimatePreview() {
   const { settings, addEstimate, updateJob } = useStore()
   const [wasEdited, setWasEdited] = useState(false)
   const editRef = useRef(null)
-  const d = JSON.parse(sessionStorage.getItem('estimateWizardData') || '{}')
+  const d = (() => {
+    try {
+      const raw = sessionStorage.getItem('estimateWizardData')
+      if (!raw) return {}
+      return JSON.parse(raw)
+    } catch(e) {
+      console.error('estimateWizardData parse error:', e)
+      return {}
+    }
+  })()
   const [generatedText] = useState(() => generateEstimateText(d, settings))
 
   const handleSave = () => {

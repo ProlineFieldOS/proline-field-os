@@ -46,7 +46,7 @@ export default function Payroll() {
     if (crew.length === 0) { toast('Add crew members first'); return }
     const crewPay = crew.map(c => {
       const h = parseFloat(hours[c.id]||0)
-      const pay = c.payType === 'daily' ? c.rate * Math.ceil(h/8) : c.rate * h
+      const pay = c.payType === 'daily' ? c.rate * Math.ceil(h/8) : c.payType === 'percent' ? 0 : c.rate * h // % type calculated at job close
       return { crewId: c.id, name: c.name, hours: h, pay: Math.round(pay*100)/100 }
     }).filter(c => c.pay > 0)
     const totalCrew = crewPay.reduce((s,c) => s+c.pay, 0)
@@ -115,7 +115,7 @@ export default function Payroll() {
                           </div>
                           <div>
                             <p className="font-semibold text-sm text-navy">{member.name}</p>
-                            <p className="text-xs text-gray-400 capitalize">{member.role} · {member.payType === 'daily' ? `$${member.rate}/day` : `$${member.rate}/hr`}</p>
+                            <p className="text-xs text-gray-400 capitalize">{member.role} · {member.payType === 'daily' ? `$${member.rate}/day` : member.payType === 'percent' ? `${member.rate}% of labor` : `$${member.rate}/hr`}</p>
                           </div>
                         </div>
                         <span className={cn('badge text-xs', member.role==='foreman'?'badge-blue':'badge-gray')}>{member.role}</span>
@@ -142,9 +142,9 @@ export default function Payroll() {
           <FormGroup label="Phone"><Input type="tel" value={crewForm.phone} onChange={setCF('phone')} /></FormGroup>
           <div className="grid grid-cols-2 gap-3">
             <FormGroup label="Role"><Select value={crewForm.role} onChange={setCF('role')}><option value="crew">Crew</option><option value="foreman">Foreman</option></Select></FormGroup>
-            <FormGroup label="Pay type"><Select value={crewForm.payType} onChange={setCF('payType')}><option value="daily">Daily rate</option><option value="hourly">Hourly</option></Select></FormGroup>
+            <FormGroup label="Pay type"><Select value={crewForm.payType} onChange={setCF('payType')}><option value="daily">Daily rate</option><option value="hourly">Hourly</option><option value="percent">% of job labor</option></Select></FormGroup>
           </div>
-          <FormGroup label={crewForm.payType === 'daily' ? 'Daily rate ($)' : 'Hourly rate ($)'}><Input type="number" value={crewForm.rate} onChange={setCF('rate')} placeholder="0.00" /></FormGroup>
+          <FormGroup label={crewForm.payType === 'daily' ? 'Daily rate ($)' : crewForm.payType === 'percent' ? 'Labor % (e.g. 35 = 35%)' : 'Hourly rate ($)'}><Input type="number" value={crewForm.rate} onChange={setCF('rate')} placeholder="0.00" /></FormGroup>
         </div>
       </Modal>
 
@@ -159,7 +159,7 @@ export default function Payroll() {
               <div key={c.id} className="flex items-center gap-3 mb-2">
                 <span className="text-sm text-navy w-32 flex-shrink-0 truncate">{c.name}</span>
                 <Input type="number" value={hours[c.id]||''} onChange={e => setHours(h=>({...h,[c.id]:e.target.value}))} placeholder="0" className="w-20" />
-                <span className="text-xs text-gray-400">hrs{c.payType==='daily'?` (${Math.ceil((parseFloat(hours[c.id])||0)/8)} days)`:''}</span>
+                <span className="text-xs text-gray-400">hrs{c.payType==='daily'?` (${Math.ceil((parseFloat(hours[c.id])||0)/8)} days)`:c.payType==='percent'?' (% — calculated at job close)':''}</span>
                 {hours[c.id] && <span className="text-xs font-semibold text-navy ml-auto">{fmtM(c.payType==='daily'?c.rate*Math.ceil((parseFloat(hours[c.id])||0)/8):c.rate*(parseFloat(hours[c.id])||0))}</span>}
               </div>
             ))}

@@ -32,7 +32,7 @@ export default function CrewView() {
             </div>
             <div>
               <p className="font-bold text-white text-base">{member.name}</p>
-              <p className="text-white/50 text-xs capitalize">{member.role} · {member.payType === 'daily' ? `$${member.rate}/day` : `$${member.rate}/hr`}</p>
+              <p className="text-white/50 text-xs capitalize">{member.role} · {member.payType === 'daily' ? `$${member.rate}/day` : member.payType === 'percent' ? `${member.rate}% of labor` : `$${member.rate}/hr`}</p>
               {member.phone && <a href={`tel:${member.phone}`} className="text-white/60 text-xs">{member.phone}</a>}
             </div>
           </div>
@@ -108,7 +108,7 @@ export default function CrewView() {
                       </div>
                       <div className="flex-1 min-w-0">
                         <p className="font-semibold text-sm text-navy">{member.name}</p>
-                        <p className="text-xs text-gray-400 capitalize">{member.role} · {member.payType === 'daily' ? `$${member.rate}/day` : `$${member.rate}/hr`}</p>
+                        <p className="text-xs text-gray-400 capitalize">{member.role} · {member.payType === 'daily' ? `$${member.rate}/day` : member.payType === 'percent' ? `${member.rate}% of labor` : `$${member.rate}/hr`}</p>
                         {memberJobs.length > 0 && (
                           <p className="text-xs text-brand mt-0.5">{memberJobs.length} active job{memberJobs.length > 1 ? 's' : ''}</p>
                         )}

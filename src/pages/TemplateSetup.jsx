@@ -9,13 +9,46 @@ import { toast } from '../components/ui'
 import { cn } from '../lib/utils'
 
 const TRADE_SERVICES = {
-  gutters: ['Seamless gutter installation','Gutter repair','Gutter cleaning','Fascia & soffit','Downspout installation','Gutter guards'],
-  roofing: ['Shingle replacement','Metal roofing','Flat/TPO roofing','Roof repair','Skylight installation'],
-  hvac: ['AC installation','Furnace installation','Heat pump','HVAC repair','Mini-split','Maintenance'],
-  plumbing: ['Water heater','Drain cleaning','Pipe repair','Fixture installation','Repiping'],
-  painting: ['Exterior painting','Interior painting','Cabinet painting','Deck staining','Pressure washing'],
-  siding: ['Vinyl siding','Fiber cement','Siding repair','Soffit & fascia','Trim installation'],
-  general: ['Kitchen remodel','Bathroom remodel','Additions','Basement finishing'],
+  gutters: [
+    'Seamless gutter installation','Gutter replacement','Gutter repair','Gutter cleaning',
+    'Downspout installation','Downspout repair','Gutter guards / leaf protection',
+    'Fascia replacement','Soffit replacement','Fascia & soffit repair',
+    'Drip edge installation','Ice & water shield','Gutter realignment',
+    'Downspout extensions','Underground drainage','Splash blocks',
+  ],
+  roofing: [
+    'Shingle replacement','Metal roofing','Flat / TPO roofing','EPDM roofing',
+    'Roof repair','Emergency roof repair','Skylight installation','Skylight repair',
+    'Chimney flashing','Valley flashing','Ridge cap','Decking replacement',
+    'Attic ventilation','Soffit & fascia','Drip edge','Ice & water shield',
+  ],
+  hvac: [
+    'AC installation','AC replacement','Furnace installation','Heat pump installation',
+    'Mini-split installation','HVAC repair','HVAC maintenance','Duct cleaning',
+    'Duct sealing','Thermostat installation','Air quality systems','Refrigerant recharge',
+  ],
+  plumbing: [
+    'Water heater installation','Tankless water heater','Drain cleaning','Hydro jetting',
+    'Pipe repair','Pipe replacement','Repiping','Fixture installation',
+    'Toilet replacement','Faucet installation','Water softener','Sump pump',
+    'Gas line work','Backflow prevention','Sewer line repair',
+  ],
+  painting: [
+    'Exterior painting','Interior painting','Cabinet painting','Deck staining',
+    'Fence staining','Pressure washing','Power washing','Epoxy floor coating',
+    'Drywall repair','Trim painting','Stucco painting','Concrete sealing',
+  ],
+  siding: [
+    'Vinyl siding installation','Fiber cement siding','Wood siding','Hardie board',
+    'Siding repair','Siding replacement','Soffit installation','Fascia installation',
+    'Trim installation','Wrap installation','Caulking','Storm damage repair',
+  ],
+  general: [
+    'Kitchen remodel','Bathroom remodel','Room addition','Basement finishing',
+    'Deck construction','Deck repair','Fence installation','Flooring installation',
+    'Tile installation','Drywall installation','Insulation','Window replacement',
+    'Door replacement','Garage door','Concrete work','Masonry',
+  ],
 }
 
 export default function TemplateSetup() {
@@ -64,7 +97,7 @@ export default function TemplateSetup() {
 Trade: ${trade}
 Company: ${form.coName || 'Contractor'}
 Primary state: ${form.primaryState}${form.otherStates ? ', also: '+form.otherStates : ''}
-Services: ${form.services.join(', ')}
+Services: ${[...form.services, ...(form.customServices ? form.customServices.split(',').map(s=>s.trim()).filter(Boolean) : [])].join(', ')}
 
 Return ONLY valid JSON, no markdown:
 {
@@ -145,7 +178,7 @@ Return ONLY valid JSON, no markdown:
   }
 
   const services = TRADE_SERVICES[form.trade] || []
-  const PAY_METHODS = ['Check','Zelle','Cash App','Venmo','ACH','Cash','Credit Card']
+  const PAY_METHODS = ['Check','Zelle','Cash App','Venmo','PayPal','ACH','Cash','Credit Card']
 
   return (
     <div className="screen">
@@ -158,7 +191,7 @@ Return ONLY valid JSON, no markdown:
         </p>
       </div>
 
-      <div className="flex-1 overflow-y-auto px-4 pt-4 pb-32">
+      <div className="flex-1 overflow-y-auto px-4 pt-4" style={{paddingBottom:'140px'}}>
         {step === 1 && (
           <div className="space-y-4">
             <div className="bg-blue-50 border border-blue-200 rounded-xl p-3 text-xs text-blue-800 leading-relaxed">
@@ -195,8 +228,8 @@ Return ONLY valid JSON, no markdown:
               </FormGroup>
             </div>
             {services.length > 0 && (
-              <FormGroup label="Services you offer">
-                <div className="flex flex-wrap gap-2">
+              <FormGroup label="Services you offer" hint="Select all that apply — or type additional services below">
+                <div className="flex flex-wrap gap-2 mb-2">
                   {services.map(s => (
                     <button key={s} onClick={() => toggleService(s)}
                       className={cn('px-3 py-1.5 rounded-full text-xs font-semibold border transition-colors', form.services.includes(s)?'bg-navy text-white border-navy':'bg-white text-gray-500 border-gray-200')}>
@@ -204,6 +237,8 @@ Return ONLY valid JSON, no markdown:
                     </button>
                   ))}
                 </div>
+                <Input value={form.customServices||''} onChange={e => setForm(f => ({...f, customServices: e.target.value}))}
+                  placeholder="Add more services, comma-separated (e.g. Copper gutters, Historic restoration)" />
               </FormGroup>
             )}
           </div>
@@ -289,7 +324,7 @@ Return ONLY valid JSON, no markdown:
       </div>
 
       {step < 3 && (
-        <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-100 p-4 flex gap-3" style={{paddingBottom:'calc(16px + env(safe-area-inset-bottom))'}}>
+        <div className="fixed left-0 right-0 bg-white border-t border-gray-100 p-4 flex gap-3" style={{bottom:'65px', paddingBottom:'env(safe-area-inset-bottom)'}}>
           <Button variant="ghost" className="flex-1" onClick={() => step > 1 ? setStep(s=>s-1) : navigate('/admin?tab=Contracts')}>
             {step > 1 ? '← Back' : 'Cancel'}
           </Button>

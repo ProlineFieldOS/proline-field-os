@@ -15,8 +15,24 @@ export default function ContractPreview() {
   const [ackName, setAckName] = useState('')
   const [wasEdited, setWasEdited] = useState(false)
   const editRef = useRef(null)
-  const wizardData = JSON.parse(sessionStorage.getItem('wizardData') || '{}')
-  const [generatedText] = useState(() => generateContractText(wizardData, settings))
+  const wizardData = (() => {
+    try {
+      const raw = sessionStorage.getItem('wizardData')
+      if (!raw) return {}
+      return JSON.parse(raw)
+    } catch(e) {
+      console.error('wizardData parse error:', e)
+      return {}
+    }
+  })()
+  const [generatedText] = useState(() => {
+    try {
+      return generateContractText(wizardData, settings)
+    } catch(e) {
+      console.error('Contract generation error:', e)
+      return 'Error generating contract text. Please go back and try again.\n\nError: ' + e.message
+    }
+  })
   const [currentText, setCurrentText] = useState(generatedText)
 
   const canProceed = ackOption && ackName.trim().length >= 2

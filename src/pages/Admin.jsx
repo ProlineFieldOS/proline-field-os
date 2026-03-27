@@ -17,7 +17,7 @@ export default function Admin() {
   const { signOut, user } = useAuth()
 
   const co = settings || {}
-  const { contractTemplate, contractTemplateMeta } = useStore()
+  const { contractTemplate, contractTemplateMeta } = useStore(s => ({ contractTemplate: s.contractTemplate, contractTemplateMeta: s.contractTemplateMeta }))
   const cd = co.contractDefaults || {}
 
   const [company, setCompany] = useState({ coName: co.coName||'', coPhone: co.coPhone||'', coEmail: co.coEmail||'', license: co.license||'', primaryState: co.primaryState||'SC', tagline: co.tagline||'' })
@@ -108,7 +108,7 @@ export default function Admin() {
                 <p className="font-semibold text-white text-xs">{co.contractTemplateMeta?.trade ? 'Template loaded: '+co.contractTemplateMeta.trade : 'No AI template'}</p>
                 <p className="text-white/50 text-xs mt-0.5">{co.contractTemplateMeta?.generatedAt ? 'Generated '+new Date(co.contractTemplateMeta.generatedAt).toLocaleDateString() : 'Generate trade-specific scope, warranty & CO language'}</p>
               </div>
-              <button onClick={() => navigate('/template-setup')} className="text-xs font-bold text-white bg-brand rounded-lg px-3 py-1.5 flex-shrink-0">{co.contractTemplateMeta ? 'Regenerate' : 'Set up'}</button>
+              <button onClick={() => navigate('/template-setup')} className="text-xs font-bold text-white bg-brand rounded-lg px-3 py-1.5 flex-shrink-0">{contractTemplateMeta ? 'Regenerate' : 'Set up'}</button>
             </div>
             <SectionTitle>Contract defaults</SectionTitle>
             <div className="grid grid-cols-2 gap-3">

@@ -494,7 +494,7 @@ export default function JobDetail() {
           <FormGroup label="Amount *"><Input type="number" value={payForm.amount} onChange={e=>setPayForm(f=>({...f,amount:e.target.value}))} placeholder="0.00" /></FormGroup>
           <FormGroup label="Method">
             <Select value={payForm.method} onChange={e=>setPayForm(f=>({...f,method:e.target.value}))}>
-              {['Check','Zelle','Cash App','Venmo','ACH','Cash','Credit Card','Other'].map(m=><option key={m} value={m}>{m}</option>)}
+              {['Check','Zelle','Cash App','Venmo','PayPal','ACH','Cash','Credit Card','Other'].map(m=><option key={m} value={m}>{m}</option>)}
             </Select>
           </FormGroup>
           <FormGroup label="Date"><Input type="date" value={payForm.date} onChange={e=>setPayForm(f=>({...f,date:e.target.value}))} /></FormGroup>

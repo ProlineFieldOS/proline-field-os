@@ -119,7 +119,7 @@ export default function EstimateWizard() {
         )}
       </div>
 
-      <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-100 p-4 flex gap-3" style={{paddingBottom:'calc(16px + env(safe-area-inset-bottom))'}}>
+      <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-100 p-4 flex gap-3" style={{bottom:'65px', paddingBottom:'env(safe-area-inset-bottom)'}}>
         <Button variant="ghost" className="flex-1" onClick={() => step > 1 ? setStep(s=>s-1) : navigate(`/jobs/${jobId}`)}>← Back</Button>
         <Button variant="primary" className="flex-[2]" onClick={next}>{step < 4 ? 'Continue →' : 'Preview estimate →'}</Button>
       </div>

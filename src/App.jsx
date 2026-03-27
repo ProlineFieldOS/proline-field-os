@@ -1,5 +1,6 @@
 import { Routes, Route, Navigate } from 'react-router-dom'
 import { AuthProvider, useAuth } from './hooks/useAuth'
+import Landing from './pages/Landing'
 import { useStore } from './store'
 import { ToastProvider } from './components/ui'
 import { AppShell } from './components/layout/AppShell'
@@ -32,6 +33,25 @@ import CrewView from './pages/CrewView'
 import Materials from './pages/Materials'
 import CommLog from './pages/CommLog'
 
+function LandingOrApp() {
+  const { user, loading } = useAuth()
+  const isDemoMode = useStore(s => s.isDemoMode)
+  const isDemoLocal = (() => {
+    try {
+      const s = JSON.parse(localStorage.getItem('proline-fieldos-v1') || '{}')
+      return s?.state?.isDemoMode === true
+    } catch { return false }
+  })()
+  const demo = isDemoMode || isDemoLocal
+  if (loading && !demo) return (
+    <div className="fixed inset-0 flex items-center justify-center bg-white">
+      <div className="w-8 h-8 border-2 border-gray-200 border-t-navy rounded-full animate-spin" />
+    </div>
+  )
+  if (user || demo) return <Navigate to="/jobs" replace />
+  return <Landing />
+}
+
 function AuthGuard({ children }) {
   const { user, loading } = useAuth()
   const isDemoMode = useStore(s => s.isDemoMode)
@@ -51,7 +71,7 @@ function AuthGuard({ children }) {
       </div>
     </div>
   )
-  if (!user && !demo) return <Navigate to="/auth" replace />
+  if (!user && !demo) return <Navigate to="/" replace />
   return children
 }
 
@@ -64,7 +84,7 @@ function AppRoutes() {
         <AuthGuard>
           <AppShell>
             <Routes>
-              <Route path="/" element={<Dashboard />} />
+              <Route path="/app" element={<Dashboard />} />
               <Route path="/jobs" element={<Jobs />} />
               <Route path="/jobs/:jobId" element={<JobDetail />} />
               <Route path="/jobs/:jobId/contract/new" element={<ContractWizard />} />
@@ -87,7 +107,7 @@ function AppRoutes() {
               <Route path="/crew" element={<CrewView />} />
               <Route path="/jobs/:jobId/materials" element={<Materials />} />
               <Route path="/jobs/:jobId/comms" element={<CommLog />} />
-              <Route path="*" element={<Navigate to="/" replace />} />
+              <Route path="*" element={<Navigate to="/jobs" replace />} />
             </Routes>
           </AppShell>
         </AuthGuard>
