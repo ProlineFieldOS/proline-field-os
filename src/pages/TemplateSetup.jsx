@@ -454,8 +454,16 @@ Return ONLY valid JSON, no markdown:
                   </details>
                 ))}
 
-                <div className="flex gap-2 pt-2">
-                  <Button variant="primary" className="flex-1" onClick={saveTemplate}>Save template</Button>
+                <div className="bg-blue-50 border border-blue-100 rounded-xl p-3">
+                  <p className="text-xs font-semibold text-blue-800 mb-1">What happens when you save?</p>
+                  <p className="text-xs text-blue-700 leading-relaxed">
+                    The template is saved as a <strong>draft</strong> — stored in your account but not yet active.
+                    You can review it with your attorney, then go to <strong>Admin → Contracts</strong> to unlock it for use.
+                    Until unlocked, contracts use generic language instead of your custom template.
+                  </p>
+                </div>
+                <div className="flex gap-2 pt-1">
+                  <Button variant="primary" className="flex-1" onClick={saveTemplate}>Save as draft</Button>
                   <Button variant="ghost" className="flex-1" onClick={() => { setGenerated(null); generate() }}>Regenerate</Button>
                 </div>
               </div>

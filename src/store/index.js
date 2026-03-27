@@ -259,7 +259,7 @@ export const useStore = create(
 
       // ── Contract Template ─────────────────────────────────────────
       setContractTemplate: (tpl, meta) => {
-        set(s => ({ contractTemplate: tpl, contractTemplateMeta: meta, templateGenerationCount: (s.templateGenerationCount || 0) + 1 }))
+        set(s => ({ contractTemplate: tpl, contractTemplateMeta: { ...meta, status: 'draft', unlockedAt: null, reviewType: null, reviewedBy: null, reviewDate: null }, templateGenerationCount: (s.templateGenerationCount || 0) + 1 }))
         // Apply template defaults to settings
         if (tpl?.defaultSettings) {
           const d = tpl.defaultSettings
@@ -371,6 +371,17 @@ export const useStore = create(
       },
 
       setViewAsRole: (role) => set({ viewAsRole: role }),
+
+      unlockTemplate: (reviewType, reviewedBy, reviewDate) => set((s) => ({
+        contractTemplateMeta: {
+          ...s.contractTemplateMeta,
+          status: reviewType === 'attorney' ? 'active' : 'active_unreviewed',
+          reviewType,          // 'attorney' | 'self'
+          reviewedBy,          // attorney name or user name
+          reviewDate,          // date string
+          unlockedAt: new Date().toISOString(),
+        }
+      })),
       updateRolePermissions: (role, patch) => set((s) => ({
         rolePermissions: {
           ...s.rolePermissions,
