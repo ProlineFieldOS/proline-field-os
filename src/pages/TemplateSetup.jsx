@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { printTemplate } from '../lib/templatePrint'
 import { useNavigate } from 'react-router-dom'
 import { useStore } from '../store'
 import { useAuth } from '../hooks/useAuth'
@@ -366,6 +367,13 @@ Return ONLY valid JSON, no markdown:
                     Review all language below with your attorney before using in contracts. This AI-generated language is a starting point — your attorney should confirm it is appropriate for your state and trade.
                   </p>
                 </div>
+
+                {/* Print / export button */}
+                <button
+                  onClick={() => printTemplate(generated, { generatedAt: new Date().toISOString() }, settings?.coName)}
+                  className="w-full flex items-center justify-center gap-2 py-3 border-2 border-navy text-navy font-semibold text-sm rounded-xl hover:bg-navy hover:text-white transition-colors">
+                  🖨 Print / Save as PDF for attorney review
+                </button>
 
                 {/* Scope boilerplate */}
                 <details className="bg-white border border-gray-200 rounded-xl overflow-hidden">
