@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { printTemplate } from '../lib/templatePrint'
+import { printContractReview } from '../lib/contractReviewPrint'
 import { useNavigate } from 'react-router-dom'
 import { useStore } from '../store'
 import { useAuth } from '../hooks/useAuth'
@@ -370,9 +371,9 @@ Return ONLY valid JSON, no markdown:
 
                 {/* Print / export button */}
                 <button
-                  onClick={() => printTemplate(generated, { generatedAt: new Date().toISOString() }, settings?.coName)}
-                  className="w-full flex items-center justify-center gap-2 py-3 border-2 border-navy text-navy font-semibold text-sm rounded-xl hover:bg-navy hover:text-white transition-colors">
-                  🖨 Print / Save as PDF for attorney review
+                  onClick={() => printContractReview(generated, settings)}
+                  className="w-full flex items-center justify-center gap-2 py-3 bg-navy text-white font-semibold text-sm rounded-xl">
+                  🖨 Print full contract for attorney review
                 </button>
 
                 {/* Scope boilerplate */}
