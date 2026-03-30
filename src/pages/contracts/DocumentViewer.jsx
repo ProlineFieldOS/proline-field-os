@@ -1,25 +1,31 @@
 import { useState, useRef } from 'react'
-import { useNavigate, useParams, useSearchParams } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import { useStore } from '../../store'
+import { useAuth } from '../../hooks/useAuth'
 import { TopNav } from '../../components/layout/AppShell'
 import { Button, Modal } from '../../components/ui'
 import { toast } from '../../components/ui'
-import { cn } from '../../lib/utils'
 
 // Generic viewer/editor for any saved document (contract, estimate, CO)
 export default function DocumentViewer() {
   const { jobId, docType, docId } = useParams()
   const navigate = useNavigate()
-  const { contracts, estimates, changeOrders, updateContract, updateEstimate, updateChangeOrder, settings } = useStore()
+  const { user } = useAuth()
+  const {
+    contracts, estimates, changeOrders,
+    updateContract, updateEstimate, updateChangeOrder,
+    deleteContract, deleteEstimate, deleteChangeOrder,
+    syncToSupabase,
+  } = useStore()
   const editRef = useRef(null)
   const [edited, setEdited] = useState(false)
-  const [showConfirm, setShowConfirm] = useState(false)
+  const [showSaveConfirm, setShowSaveConfirm] = useState(false)
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
 
-  // Find the document
   const doc = (() => {
-    if (docType === 'contract')  return contracts.find(c => c.id === docId)
-    if (docType === 'estimate')  return estimates.find(e => e.id === docId)
-    if (docType === 'co')        return changeOrders.find(c => c.id === docId)
+    if (docType === 'contract') return contracts.find(c => c.id === docId)
+    if (docType === 'estimate') return estimates.find(e => e.id === docId)
+    if (docType === 'co')       return changeOrders.find(c => c.id === docId)
     return null
   })()
 
@@ -39,14 +45,26 @@ export default function DocumentViewer() {
     : docType === 'estimate' ? `Estimate ${doc.num}`
     : `Change Order ${doc.num}`
 
+  const doSync = () => { if (user?.id) syncToSupabase(user.id) }
+
   const handleSave = () => {
     const newText = editRef.current?.innerText || docText
-    if (docType === 'contract')  updateContract(docId,  { documentText: newText })
-    if (docType === 'estimate')  updateEstimate(docId,  { documentText: newText })
-    if (docType === 'co')        updateChangeOrder(docId, { documentText: newText })
+    if (docType === 'contract') updateContract(docId, { documentText: newText })
+    if (docType === 'estimate') updateEstimate(docId, { documentText: newText })
+    if (docType === 'co')       updateChangeOrder(docId, { documentText: newText })
     setEdited(false)
+    doSync()
     toast('Document saved')
-    setShowConfirm(false)
+    setShowSaveConfirm(false)
+  }
+
+  const handleDelete = () => {
+    if (docType === 'contract') deleteContract(docId)
+    if (docType === 'estimate') deleteEstimate(docId)
+    if (docType === 'co')       deleteChangeOrder(docId)
+    doSync()
+    toast(`${docLabel} deleted`)
+    navigate(jobId ? `/jobs/${jobId}` : -1)
   }
 
   const handlePrint = () => {
@@ -64,10 +82,16 @@ export default function DocumentViewer() {
     <div className="screen">
       <TopNav title={docLabel} onBack={() => navigate(-1)}
         actions={
-          <div className="flex gap-2">
+          <div className="flex gap-2 items-center">
             <button onClick={handlePrint} className="text-white/70 text-xs">Print</button>
+            <button
+              onClick={() => setShowDeleteConfirm(true)}
+              className="text-red-300 text-xs font-semibold"
+            >
+              Delete
+            </button>
             {edited && (
-              <button onClick={() => setShowConfirm(true)}
+              <button onClick={() => setShowSaveConfirm(true)}
                 className="text-xs font-bold text-white bg-brand rounded-lg px-3 py-1.5">
                 Save
               </button>
@@ -77,13 +101,11 @@ export default function DocumentViewer() {
       />
 
       <div className="flex-1 overflow-y-auto">
-        {/* Edit notice */}
         <div className="bg-amber-50 border-b border-amber-200 px-4 py-2.5 flex items-center gap-2">
           <span className="text-sm">✏️</span>
           <p className="text-xs text-amber-800">This document is editable. Tap anywhere in the text to make changes. Changes are saved back to this job.</p>
         </div>
 
-        {/* Document meta */}
         <div className="px-4 py-3 bg-gray-50 border-b border-gray-100 flex flex-wrap gap-4 text-xs text-gray-500">
           {doc.created && <span>Created {new Date(doc.created).toLocaleDateString()}</span>}
           {doc.status && <span className="capitalize">Status: {doc.status}</span>}
@@ -97,7 +119,6 @@ export default function DocumentViewer() {
           )}
         </div>
 
-        {/* Editable document text */}
         <div
           ref={editRef}
           contentEditable
@@ -115,21 +136,40 @@ export default function DocumentViewer() {
         </div>
       )}
 
-      <div className="border-t border-gray-100 p-4 flex gap-3" style={{paddingBottom:'calc(16px + env(safe-area-inset-bottom)'}}>
+      <div className="border-t border-gray-100 p-4 flex gap-3" style={{paddingBottom:'calc(16px + env(safe-area-inset-bottom))'}}>
         <Button variant="ghost" className="flex-1" onClick={handlePrint}>Print / PDF</Button>
-        <Button variant="primary" className="flex-[2]" onClick={() => setShowConfirm(true)} disabled={!edited}>
+        <Button variant="primary" className="flex-[2]" onClick={() => setShowSaveConfirm(true)} disabled={!edited}>
           {edited ? 'Save changes' : 'No changes'}
         </Button>
       </div>
 
-      <Modal open={showConfirm} title="Save changes?" onClose={() => setShowConfirm(false)}>
+      {/* Save confirm */}
+      <Modal open={showSaveConfirm} title="Save changes?" onClose={() => setShowSaveConfirm(false)}>
         <div className="p-4 space-y-4">
           <p className="text-sm text-gray-600 leading-relaxed">
             This will update the saved document text. The original generated text is preserved separately.
           </p>
           <div className="flex gap-3">
-            <Button variant="ghost" className="flex-1" onClick={() => setShowConfirm(false)}>Cancel</Button>
+            <Button variant="ghost" className="flex-1" onClick={() => setShowSaveConfirm(false)}>Cancel</Button>
             <Button variant="primary" className="flex-[2]" onClick={handleSave}>Save changes</Button>
+          </div>
+        </div>
+      </Modal>
+
+      {/* Delete confirm */}
+      <Modal open={showDeleteConfirm} title={`Delete ${docLabel}?`} onClose={() => setShowDeleteConfirm(false)}>
+        <div className="p-4 space-y-4">
+          <p className="text-sm text-gray-600 leading-relaxed">
+            This will permanently remove <strong>{docLabel}</strong> from this job. This cannot be undone.
+          </p>
+          <div className="flex gap-3">
+            <Button variant="ghost" className="flex-1" onClick={() => setShowDeleteConfirm(false)}>Cancel</Button>
+            <button
+              onClick={handleDelete}
+              className="flex-[2] bg-red-600 text-white text-sm font-semibold rounded-xl py-3 active:scale-95 transition-transform"
+            >
+              Delete permanently
+            </button>
           </div>
         </div>
       </Modal>

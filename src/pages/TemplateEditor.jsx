@@ -1,5 +1,5 @@
 import { useState, useRef, useCallback } from 'react'
-import { useNavigate, useParams } from 'react-router-dom'
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import { useStore } from '../store'
 import { useAuth } from '../hooks/useAuth'
 import { TopNav } from '../components/layout/AppShell'
@@ -22,11 +22,14 @@ const TEMPLATE_TYPES = [
 export default function TemplateEditor() {
   const navigate = useNavigate()
   const { templateType } = useParams()
+  const [searchParams] = useSearchParams()
+  // DocumentTemplates navigates with ?type= for new templates, /:type for existing
+  const resolvedType = templateType || searchParams.get('type') || null
   const { user } = useAuth()
   const { customTemplates, saveCustomTemplate, deleteCustomTemplate, settings, syncToSupabase } = useStore()
 
-  const existing = templateType ? customTemplates[templateType] : null
-  const [type, setType] = useState(templateType || 'contract_a')
+  const existing = resolvedType ? customTemplates[resolvedType] : null
+  const [type, setType] = useState(resolvedType || 'contract_a')
   const [name, setName] = useState(existing?.name || '')
   const [text, setText] = useState(existing?.text || '')
   const [preview, setPreview] = useState(false)

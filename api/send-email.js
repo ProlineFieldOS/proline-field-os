@@ -37,7 +37,7 @@ export default async function handler(req) {
   const brevoPayload = {
     sender: {
       name: fromName || 'Proline Field OS',
-      email: fromEmail || 'noreply@prolinefieldos.com',
+      email: fromEmail || 'ProlineResidential@gmail.com',
     },
     to: [{ email: to, name: toName || to }],
     subject,

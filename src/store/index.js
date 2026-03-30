@@ -178,6 +178,7 @@ export const useStore = create(
       updateContract: (id, patch) => set((s) => ({
         contracts: s.contracts.map((c) => c.id === id ? { ...c, ...patch } : c)
       })),
+      deleteContract: (id) => set((s) => ({ contracts: s.contracts.filter((c) => c.id !== id) })),
 
       // ── Change Orders ─────────────────────────────────────────────
       addChangeOrder: (co) => {
@@ -255,6 +256,8 @@ export const useStore = create(
       // ── Estimates ─────────────────────────────────────────────────
       addEstimate: (est) => set((s) => ({ estimates: [...s.estimates, est], _nextEst: (s._nextEst || 1001) + 1 })),
       updateEstimate: (id, patch) => set((s) => ({ estimates: s.estimates.map((e) => e.id === id ? { ...e, ...patch } : e) })),
+      deleteEstimate: (id) => set((s) => ({ estimates: s.estimates.filter((e) => e.id !== id) })),
+      deleteChangeOrder: (id) => set((s) => ({ changeOrders: s.changeOrders.filter((c) => c.id !== id) })),
 
       // ── Settings ──────────────────────────────────────────────────
       updateSettings: (patch) => set((s) => ({ settings: { ...s.settings, ...patch } })),
